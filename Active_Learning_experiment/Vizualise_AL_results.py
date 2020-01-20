@@ -7,13 +7,11 @@ Created on Tue Jan 14 13:17:05 2020
 
 import os
 
-from statistics import mean 
+from statistics import mean, stdev 
 from collections import Counter
 import pickle
 import matplotlib.pyplot as plt
-from statistics import stdev
 
-PATH = ''
 
 #==============================================================================
 # write and open pickled files
@@ -52,9 +50,18 @@ def mean_acc(step):
             
             # calculate mean accuracies from  n iterations for each step
             mean_acc = [mean(k) for k in zip(*to_list)]
+            #stdev_acc = [stdev(k) for k in zip(*to_list)]
+            
+            # calculate min and max values for plotting the 
+            min_acc = [min(k) for k in zip(*to_list)]
+            max_acc = [max(k) for k in zip(*to_list)]
             
             # append mean accuracies to the dictionary toghether with iterations' results
             acc[f'{model}_{selection_function}_{step}']['mean'] = mean_acc
+            #acc[f'{model}_{selection_function}_{step}']['stdev'] = stdev_acc
+            
+            acc[f'{model}_{selection_function}_{step}']['min'] = min_acc
+            acc[f'{model}_{selection_function}_{step}']['max'] = max_acc
             
     return acc
 
@@ -69,7 +76,17 @@ def result_plot(step, classif, acc):
     ax.plot(acc[f'step_{step}'], acc[f'{classif}_EntropySelection_{step}']['mean'], label = 'Entropy selection')
     ax.plot(acc[f'step_{step}'], acc[f'{classif}_MarginSamplingSelection_{step}']['mean'], label = 'Margin selection')
     ax.plot(acc[f'step_{step}'], acc[f'{classif}_RandomSelection_{step}']['mean'], label = 'Random selection')
-        
+    
+    
+    plt.fill_between(acc[f'step_{step}'], acc[f'{classif}_EntropySelection_{step}']['min'],
+                    acc[f'{classif}_EntropySelection_{step}']['max'], alpha = 0.3)
+    plt.fill_between(acc[f'step_{step}'], acc[f'{classif}_MarginSamplingSelection_{step}']['min'],
+                    acc[f'{classif}_MarginSamplingSelection_{step}']['max'], alpha = 0.3)
+    plt.fill_between(acc[f'step_{step}'], acc[f'{classif}_RandomSelection_{step}']['min'],
+                    acc[f'{classif}_RandomSelection_{step}']['max'], alpha = 0.3)
+    
+    #plt.fill_betweenx(acc[f'step_{step}'], acc[f'{classif}_EntropySelection_{step}']['stdev'],alpha = 0.5,)
+    
     ax.set_ylim([0.6,1])
     ax.grid(True)
     ax.legend(loc=4, fontsize='x-large')
@@ -118,7 +135,7 @@ pickle_name = 'AL_full_experiment_Indian_pine_' # does not include steps
 models = ['RF', 'SVM', 'LogReg']
 selection_functions = [ 'MarginSamplingSelection','EntropySelection', 'RandomSelection']
 
-# calculate the mean value of N iterations
+# calculate the mean, min and max value of N iterations
 acc_10 = mean_acc(10)
 acc_20 = mean_acc(20)
 acc_40 = mean_acc(40)
