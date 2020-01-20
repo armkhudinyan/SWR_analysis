@@ -37,14 +37,6 @@ def download():
     dataset =  np.column_stack((y,X.astype(np.object)))
     return dataset
 
-#dataset = download()
-#==============================================================================
-''' CLC data'''
-def download2():
-    path = r'C:\Users\arman\Desktop\New paper\CLC_data\dataset_10%.csv'
-    dataset = pd.read_csv(path).values
-    return dataset
-
 #============================================================================== 
 ''' Split dataset '''
 def split(dataset, train_size, test_size): 
