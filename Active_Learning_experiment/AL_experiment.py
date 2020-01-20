@@ -49,12 +49,12 @@ def download2():
 ''' Split dataset '''
 def split(dataset, train_size, test_size): 
     ''' for indian_pines '''
-    #x = dataset[:, 1:] 
-    #y = dataset[:, 0] 
+    x = dataset[:, 1:] 
+    y = dataset[:, 0] 
     
     '''for CLC data'''
-    x = dataset[:, 3:] 
-    y = dataset[:, 0] 
+    #x = dataset[:, 3:] 
+    #y = dataset[:, 0] 
                 
     x_train, x_pool, y_train, y_pool = train_test_split( x, y, 
                         train_size = train_size, stratify = y) 
@@ -183,7 +183,7 @@ def pickle_load(fname):
 
 #==============================================================================
 '''EXPERIMENT SETUP'''
-steps = [20, 40]
+steps = [10, 20, 40]
 iters = 5 # number of iterations within each selection step
 models = [RF, SVM, LogReg]#, GBC]
 selection_functions = [MarginSamplingSelection, EntropySelection, RandomSelection]
@@ -192,7 +192,7 @@ selection_functions = [MarginSamplingSelection, EntropySelection, RandomSelectio
 if __name__ == '__main__':
     
     #Loading the data
-    dataset = download2()
+    dataset = download()
     
     # store accuracy of different combinations 
     #acc = {}
