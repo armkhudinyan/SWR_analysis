@@ -12,7 +12,8 @@ from collections import Counter
 import pickle
 import matplotlib.pyplot as plt
 
-
+#PATH = r'C:\Users\arman\Desktop\ActiveLearning'
+#pickle_path = os.path.join(PATH, 'Experiment', 'Arcived_pickles')
 #==============================================================================
 # write and open pickled files
 #==============================================================================
@@ -40,29 +41,34 @@ def mean_acc(step):
         
     #load the pickeld dictionary
     acc = pickle_load(pickle_name + str(step)+'.pkl')
+    #acc = pickle_load(os.path.join(pickle_path, pickle_name + str(step)+'.pkl'))
     
-    for model in models:
-        for selection_function in selection_functions:
-            
-            
-            # make a list of lists containing accuracies for each iteration
-            to_list = [acc[f'{model}_{selection_function}_{step}'][keys] for keys in acc[f'{model}_{selection_function}_{step}']]            
-            
-            # calculate mean accuracies from  n iterations for each step
-            mean_acc = [mean(k) for k in zip(*to_list)]
-            #stdev_acc = [stdev(k) for k in zip(*to_list)]
-            
-            # calculate min and max values for plotting the 
-            min_acc = [min(k) for k in zip(*to_list)]
-            max_acc = [max(k) for k in zip(*to_list)]
-            
-            # append mean accuracies to the dictionary toghether with iterations' results
-            acc[f'{model}_{selection_function}_{step}']['mean'] = mean_acc
-            #acc[f'{model}_{selection_function}_{step}']['stdev'] = stdev_acc
-            
-            acc[f'{model}_{selection_function}_{step}']['min'] = min_acc
-            acc[f'{model}_{selection_function}_{step}']['max'] = max_acc
-            
+    # calculate mean accuracy if the iterations are more than 1
+    if len(acc[(list(acc))[0]]) >1:
+        
+        for model in models:
+            for selection_function in selection_functions:
+                
+                
+                # make a list of lists containing accuracies for each iteration
+                to_list = [acc[f'{model}_{selection_function}_{step}'][keys] for keys in acc[f'{model}_{selection_function}_{step}']]            
+                
+                # calculate mean accuracies from  n iterations for each step
+                mean_acc = [mean(k) for k in zip(*to_list)]
+                #stdev_acc = [stdev(k) for k in zip(*to_list)]
+                
+                # calculate min and max values for plotting the 
+                min_acc = [min(k) for k in zip(*to_list)]
+                max_acc = [max(k) for k in zip(*to_list)]
+                
+                # append mean accuracies to the dictionary toghether with iterations' results
+                acc[f'{model}_{selection_function}_{step}']['mean'] = mean_acc
+                #acc[f'{model}_{selection_function}_{step}']['stdev'] = stdev_acc
+                
+                acc[f'{model}_{selection_function}_{step}']['min'] = min_acc
+                acc[f'{model}_{selection_function}_{step}']['max'] = max_acc
+    else:
+        pass
     return acc
 
 
@@ -72,22 +78,26 @@ def result_plot(step, classif, acc):
     # plot the upper results for the classifier with standard train/test split
     ax.axhline(standard[f'standard_{classif}'], label='standard_' + str(classif))
     
-    # plot the mean accuracies for a diven model and selection strategy
-    ax.plot(acc[f'step_{step}'], acc[f'{classif}_EntropySelection_{step}']['mean'], label = 'Entropy selection')
-    ax.plot(acc[f'step_{step}'], acc[f'{classif}_MarginSamplingSelection_{step}']['mean'], label = 'Margin selection')
-    ax.plot(acc[f'step_{step}'], acc[f'{classif}_RandomSelection_{step}']['mean'], label = 'Random selection')
+    if len(acc[(list(acc))[0]]) ==1:
+        # plot the  accuracies for a diven model and selection strategy
+        ax.plot(acc[f'step_{step}'], acc[f'{classif}_EntropySelection_{step}']['iter_1'], label = 'Entropy selection')
+        ax.plot(acc[f'step_{step}'], acc[f'{classif}_MarginSamplingSelection_{step}']['iter_1'], label = 'Margin selection')
+        ax.plot(acc[f'step_{step}'], acc[f'{classif}_RandomSelection_{step}']['iter_1'], label = 'Random selection')
+    else:
+        # plot the mean accuracies for a diven model and selection strategy
+        ax.plot(acc[f'step_{step}'], acc[f'{classif}_EntropySelection_{step}']['mean'], label = 'Entropy selection')
+        ax.plot(acc[f'step_{step}'], acc[f'{classif}_MarginSamplingSelection_{step}']['mean'], label = 'Margin selection')
+        ax.plot(acc[f'step_{step}'], acc[f'{classif}_RandomSelection_{step}']['mean'], label = 'Random selection')
+        
+        # plot the min/max boundaries around the mean value
+        plt.fill_between(acc[f'step_{step}'], acc[f'{classif}_EntropySelection_{step}']['min'],
+                        acc[f'{classif}_EntropySelection_{step}']['max'], alpha = 0.3)
+        plt.fill_between(acc[f'step_{step}'], acc[f'{classif}_MarginSamplingSelection_{step}']['min'],
+                        acc[f'{classif}_MarginSamplingSelection_{step}']['max'], alpha = 0.3)
+        plt.fill_between(acc[f'step_{step}'], acc[f'{classif}_RandomSelection_{step}']['min'],
+                        acc[f'{classif}_RandomSelection_{step}']['max'], alpha = 0.3)
     
-    
-    plt.fill_between(acc[f'step_{step}'], acc[f'{classif}_EntropySelection_{step}']['min'],
-                    acc[f'{classif}_EntropySelection_{step}']['max'], alpha = 0.3)
-    plt.fill_between(acc[f'step_{step}'], acc[f'{classif}_MarginSamplingSelection_{step}']['min'],
-                    acc[f'{classif}_MarginSamplingSelection_{step}']['max'], alpha = 0.3)
-    plt.fill_between(acc[f'step_{step}'], acc[f'{classif}_RandomSelection_{step}']['min'],
-                    acc[f'{classif}_RandomSelection_{step}']['max'], alpha = 0.3)
-    
-    #plt.fill_betweenx(acc[f'step_{step}'], acc[f'{classif}_EntropySelection_{step}']['stdev'],alpha = 0.5,)
-    
-    ax.set_ylim([0.6,1])
+    ax.set_ylim([0.4,0.9])
     ax.grid(True)
     ax.legend(loc=4, fontsize='x-large')
     
@@ -108,7 +118,7 @@ def model_perform_plot(step, selection_function, acc):
     ax.plot(acc[f'step_{step}'], acc[str(models[1]) +'_'+ str(selection_function) +'_'+ str(step)]['mean'], label = models[1])
     ax.plot(acc[f'step_{step}'], acc[str(models[2]) +'_'+ str(selection_function) +'_'+ str(step)]['mean'], label = models[2])
         
-    ax.set_ylim([0.65,1])
+    ax.set_ylim([0.3,1])
     ax.grid(True)
     ax.legend(loc=4, fontsize='x-large')
     
@@ -128,24 +138,25 @@ Standard classifiers with train/test split (test_size= 0.33) were shuffeled
 #standard_RF= 0.91
 #standard_LogReg= 0.90
 #standard_SVM= 0.90
-standard = {'standard_RF':0.91, 'standard_LogReg':  0.90, 'standard_SVM': 0.90}
+standard = {'standard_RF':0.75, 'standard_LogReg':  0.73, 'standard_SVM': 0.74}
 
 #step = 20 
-pickle_name = 'AL_full_experiment_Indian_pine_' # does not include steps
-models = ['RF', 'SVM', 'LogReg']
+pickle_name = 'AL_test_run_agri_' # does not include steps
+models = ['RF']#, 'SVM', 'LogReg']
 selection_functions = [ 'MarginSamplingSelection','EntropySelection', 'RandomSelection']
 
 # calculate the mean, min and max value of N iterations
-acc_10 = mean_acc(10)
-acc_20 = mean_acc(20)
-acc_40 = mean_acc(40)
-
+#acc_10 = mean_acc(10)
+#acc_20 = mean_acc(20)
+#acc_40 = mean_acc(40)
+acc_50 = mean_acc(50)
 
 # plot the reuslts for Random Forest
-result_plot(10, classif= 'RF', acc = acc_10 )    
-result_plot(20, classif= 'RF', acc = acc_20 )
-result_plot(40, classif= 'RF', acc = acc_40 )
-
+#result_plot(10, classif= 'RF', acc = acc_10 )    
+#result_plot(20, classif= 'RF', acc = acc_20 )
+#result_plot(40, classif= 'RF', acc = acc_40 )
+result_plot(50, classif= 'RF', acc = acc_50 )
+'''
 # plot the reuslts for Logistic Regression 
 result_plot(10, classif= 'LogReg', acc=acc_10 )    
 result_plot(20, classif= 'LogReg', acc=acc_20 )
@@ -160,7 +171,7 @@ result_plot(40, classif= 'SVM', acc=acc_40 )
 model_perform_plot(20, selection_function = selection_functions[0], acc=acc_20)
 model_perform_plot(20, selection_function = selection_functions[1], acc=acc_20)
 model_perform_plot(20, selection_function = selection_functions[2], acc=acc_20)
-
+'''
 
 
 
