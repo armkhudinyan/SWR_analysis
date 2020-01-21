@@ -32,9 +32,8 @@ def pickle_load(fname):
   return data
 
 #==============================================================================
-'''Classification accuracies of standard train-test split
-(test_size = 0.33). The results are the average of 5 iterations'''
-
+# define plotting functions
+#==============================================================================
 def mean_acc(step):
     '''Calculate mean values for classification outputs for N iterations and
     add to the values of iterations in the dictionary'''
@@ -48,8 +47,7 @@ def mean_acc(step):
         
         for model in models:
             for selection_function in selection_functions:
-                
-                
+  
                 # make a list of lists containing accuracies for each iteration
                 to_list = [acc[f'{model}_{selection_function}_{step}'][keys] for keys in acc[f'{model}_{selection_function}_{step}']]            
                 
@@ -71,9 +69,9 @@ def mean_acc(step):
         pass
     return acc
 
-
 def result_plot(step, classif, acc):
-        
+    '''Plot accuracies (mean, min, max) values'''
+    
     fig, ax = plt.subplots(figsize=(8, 6))
     # plot the upper results for the classifier with standard train/test split
     ax.axhline(standard[f'standard_{classif}'], label='standard_' + str(classif))
@@ -106,9 +104,9 @@ def result_plot(step, classif, acc):
     plt.title(f'{classif}     Step[{step}]',  fontsize='xx-large')
     plt.show()
 
-
 def model_perform_plot(step, selection_function, acc):
-
+    '''Plot the models with same selection
+    function together'''
     fig, ax = plt.subplots(figsize=(10, 8))
     # plot the upper results for the classifier with standard train/test split
     ax.axhline(standard[f'standard_RF'], label='standard_RF')
@@ -126,7 +124,6 @@ def model_perform_plot(step, selection_function, acc):
     plt.ylabel('Accuracy',  fontsize='x-large')
     plt.title(f'{selection_function}      Step[{step}]',  fontsize='xx-large')
     plt.show()
-
 
 #==============================================================================
 # Plot calculate the 'mean' accuracy and plot the graphs
@@ -146,17 +143,15 @@ models = ['RF']#, 'SVM', 'LogReg']
 selection_functions = [ 'MarginSamplingSelection','EntropySelection', 'RandomSelection']
 
 # calculate the mean, min and max value of N iterations
-#acc_10 = mean_acc(10)
-#acc_20 = mean_acc(20)
-#acc_40 = mean_acc(40)
-acc_50 = mean_acc(50)
+acc_10 = mean_acc(10)
+acc_20 = mean_acc(20)
+acc_40 = mean_acc(40)
 
 # plot the reuslts for Random Forest
-#result_plot(10, classif= 'RF', acc = acc_10 )    
-#result_plot(20, classif= 'RF', acc = acc_20 )
-#result_plot(40, classif= 'RF', acc = acc_40 )
-result_plot(50, classif= 'RF', acc = acc_50 )
-'''
+result_plot(10, classif= 'RF', acc = acc_10 )    
+result_plot(20, classif= 'RF', acc = acc_20 )
+result_plot(40, classif= 'RF', acc = acc_40 )
+
 # plot the reuslts for Logistic Regression 
 result_plot(10, classif= 'LogReg', acc=acc_10 )    
 result_plot(20, classif= 'LogReg', acc=acc_20 )
@@ -171,12 +166,3 @@ result_plot(40, classif= 'SVM', acc=acc_40 )
 model_perform_plot(20, selection_function = selection_functions[0], acc=acc_20)
 model_perform_plot(20, selection_function = selection_functions[1], acc=acc_20)
 model_perform_plot(20, selection_function = selection_functions[2], acc=acc_20)
-'''
-
-
-
-
-
-
-
-
