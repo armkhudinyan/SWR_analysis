@@ -55,7 +55,7 @@ def mean_acc(step):
                 mean_acc = [mean(k) for k in zip(*to_list)]
                 #stdev_acc = [stdev(k) for k in zip(*to_list)]
                 
-                # calculate min and max values for plotting the 
+                # calculate min and max values for plotting 
                 min_acc = [min(k) for k in zip(*to_list)]
                 max_acc = [max(k) for k in zip(*to_list)]
                 
@@ -95,7 +95,7 @@ def result_plot(step, classif, acc):
         plt.fill_between(acc[f'step_{step}'], acc[f'{classif}_RandomSelection_{step}']['min'],
                         acc[f'{classif}_RandomSelection_{step}']['max'], alpha = 0.3)
     
-    ax.set_ylim([0.4,0.9])
+    ax.set_ylim([0.4,1])
     ax.grid(True)
     ax.legend(loc=4, fontsize='x-large')
     
@@ -116,7 +116,7 @@ def model_perform_plot(step, selection_function, acc):
     ax.plot(acc[f'step_{step}'], acc[str(models[1]) +'_'+ str(selection_function) +'_'+ str(step)]['mean'], label = models[1])
     ax.plot(acc[f'step_{step}'], acc[str(models[2]) +'_'+ str(selection_function) +'_'+ str(step)]['mean'], label = models[2])
         
-    ax.set_ylim([0.3,1])
+    ax.set_ylim([0.4,1])
     ax.grid(True)
     ax.legend(loc=4, fontsize='x-large')
     
@@ -139,7 +139,7 @@ standard = {'standard_RF':0.75, 'standard_LogReg':  0.73, 'standard_SVM': 0.74}
 
 #step = 20 
 pickle_name = 'AL_test_run_agri_' # does not include steps
-models = ['RF']#, 'SVM', 'LogReg']
+models = ['RF', 'SVM', 'LogReg']
 selection_functions = [ 'MarginSamplingSelection','EntropySelection', 'RandomSelection']
 
 # calculate the mean, min and max value of N iterations
