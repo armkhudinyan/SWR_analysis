@@ -64,13 +64,13 @@ def split(dataset, train_size, test_size):
 #==============================================================================
     ''' DATA SELECTION STRATEGIES
     
-    rank the prediction uncertainty for each predicted sample based on the 
+    Rank the prediction uncertainty for each predicted sample based on the 
     classification probability autput  '''
 
 ''' Uncertainty with Entropy value'''
 def EntropySelection(y_probab):
     # entropy measure
-    # avoid having absolut 0 for probab. values
+    # avoid having absolut 0 for probab. values in RF case
     if model.__name__ =='RF':
         y_prob = np.where(np.isin(y_probab, [0,1]), np.clip(y_probab,1e-10,1), y_probab)
         e = (-y_prob * np.log2(y_prob)).sum(axis=1) 
@@ -82,7 +82,8 @@ def EntropySelection(y_probab):
 
 ''' Uncertainty with Margine sampling '''
 def MarginSamplingSelection(y_probab):
-    # Selecting Margine samples
+    # Selecting Margine samples as a smallest difference of probability values
+    # between the first and second most probabel classes
     rev = np.sort(y_probab, axis=1)[:, ::-1]
     values = rev[:, 0] - rev[:, 1]
     selection = np.argsort(values)[:step]
@@ -157,6 +158,8 @@ def SVM():
     return (y_probab, score)
 
 #==============================================================================
+# Define functions for saving and loading pickles
+
 def pickle_save(fname, data):
   filehandler = open(fname,"wb")
   pickle.dump(data,filehandler)
@@ -184,11 +187,8 @@ if __name__ == '__main__':
     #Loading the data
     dataset = download()
     
-    # store accuracy of different combinations 
-    #acc = {}
-    
     for step in steps:# count of selected sample in each iteration
-        
+        # store accuracy of different combinations 
         acc = {} # store accuracy of different combinations 
                
         for model in models:   # classifier
@@ -206,7 +206,7 @@ if __name__ == '__main__':
     
                     # let the active method select up to ~20% of training data
                     max_training = round(0.25*len(label)) 
-                    #max_training = len(label)-20
+                    #max_training = len(label) - step # for exhaustive run
                     
                     # create an empty list inside the dictionary for each iteration
                     acc[model.__name__+ '_' +selection_function.__name__+'_'+ str(step)][f'iter_{i}'] = []
