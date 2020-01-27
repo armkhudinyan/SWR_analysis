@@ -3,6 +3,14 @@
 Created on Fri Nov 22 17:09:20 2019
 
 @author: arman
+
+The code is desined for AVIRIS HS imagery on Indian Pines dataset.
+Without extra tuning running the code will performe Active Learning (AL)
+experiment using 3 selection methods (Entropy selection, Margin selection 
+and Random selection) combined with 3 classifiers (Random Forest, Logistic Regression
+and Support Vector classifiers). The experiment is set up to 5 iterations. 
+Later the results can be averaged. Experiment results will be saved as
+pickled fiels in the same folder as AL_experiment.py 
 """
 import os
 import time
@@ -28,13 +36,16 @@ from sklearn.svm import SVC
 ''' Indian pines dataset '''
 def download():
     X, y = tuple(fetch_openml('Indian_pines').values())[:2]
+	
     # unmute one of the lines if you want to binerize the dataset
     #y = np.array((y== 'Soybeans').astype(int)) 
     #y = np.array(['Soybeans' if i=='Soybeans' else 'Other' for i in y])
+	
     class_size = Counter(y)
     classes = len(np.unique(y))
     print ('Indian_pines:', X.shape, y.shape, classes, class_size)
     dataset =  np.column_stack((y,X.astype(np.object)))
+	
     return dataset
 
 #============================================================================== 
