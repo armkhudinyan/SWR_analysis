@@ -12,23 +12,23 @@ import pandas as pd
 from statistics import mean 
 from collections import Counter
 import pickle
+import matplotlib.pyplot as plt
+
 from sklearn.preprocessing import StandardScaler 
 from sklearn.datasets import fetch_openml
-import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split 
+from statistics import stdev
 
 from sklearn.linear_model import LogisticRegression 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.svm import SVC
 
-from sklearn.model_selection import train_test_split 
-from statistics import stdev
-
 #==============================================================================
 ''' Indian pines dataset '''
 def download():
     X, y = tuple(fetch_openml('Indian_pines').values())[:2]
-    #X = X.astype('float64')
+    # unmute one of the lines if you want to binerize the dataset
     #y = np.array((y== 'Soybeans').astype(int)) 
     #y = np.array(['Soybeans' if i=='Soybeans' else 'Other' for i in y])
     class_size = Counter(y)
@@ -44,13 +44,11 @@ def split(dataset, train_size, test_size):
     x = dataset[:, 1:] 
     y = dataset[:, 0] 
     
-    '''for CLC data'''
-    #x = dataset[:, 3:] 
-    #y = dataset[:, 0] 
-                
+    # split data to get the initial training split
     x_train, x_pool, y_train, y_pool = train_test_split( x, y, 
                         train_size = train_size, stratify = y) 
     
+    # split data into candidates pool for AL and test data 
     unlabel, x_test, label, y_test = train_test_split( x_pool, y_pool, 
                     test_size = test_size, stratify = y_pool)
     
