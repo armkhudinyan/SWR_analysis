@@ -77,12 +77,12 @@ def result_plot(step, classif, acc):
     ax.axhline(standard[f'standard_{classif}'], label='standard_' + str(classif))
     
     if len(acc[(list(acc))[0]]) ==1:
-        # plot the  accuracies for a diven model and selection strategy
+        # plot the  accuracies for a given model and selection strategy
         ax.plot(acc[f'step_{step}'], acc[f'{classif}_EntropySelection_{step}']['iter_1'], label = 'Entropy selection')
         ax.plot(acc[f'step_{step}'], acc[f'{classif}_MarginSamplingSelection_{step}']['iter_1'], label = 'Margin selection')
         ax.plot(acc[f'step_{step}'], acc[f'{classif}_RandomSelection_{step}']['iter_1'], label = 'Random selection')
     else:
-        # plot the mean accuracies for a diven model and selection strategy
+        # plot the mean accuracies for a given model and selection strategy
         ax.plot(acc[f'step_{step}'], acc[f'{classif}_EntropySelection_{step}']['mean'], label = 'Entropy selection')
         ax.plot(acc[f'step_{step}'], acc[f'{classif}_MarginSamplingSelection_{step}']['mean'], label = 'Margin selection')
         ax.plot(acc[f'step_{step}'], acc[f'{classif}_RandomSelection_{step}']['mean'], label = 'Random selection')
