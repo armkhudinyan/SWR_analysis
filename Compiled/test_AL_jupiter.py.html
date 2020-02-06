@@ -13714,10 +13714,10 @@ dtype: int64
                 <span class="c1">#print(&#39;Iter: &#39;, i)</span>
 
                 <span class="c1"># Split dataset into train(5 %), test(25 %), unlabel(70 %) </span>
-                <span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">unlabel</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">)</span> 
+                <span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">unlabel</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">)</span> 
 
                 <span class="c1"># Let the active method select up to ~20% of training data</span>
-                <span class="n">max_training</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="mf">0.02</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">label</span><span class="p">))</span> 
+                <span class="n">max_training</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="mf">0.2</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">label</span><span class="p">))</span> 
                 
                 <span class="c1"># Create an empty list inside the dictionary for each iteration</span>
                 <span class="n">acc</span><span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="vm">__name__</span><span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span><span class="n">selection_function</span><span class="o">.</span><span class="vm">__name__</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">step</span><span class="p">)][</span><span class="n">f</span><span class="s1">&#39;iter_</span><span class="si">{i}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
@@ -14061,7 +14061,7 @@ in case we run the same combination more than once</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[117]:</div>
+<div class="prompt input_prompt">In&nbsp;[138]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set up AL combinations for plotting</span>
@@ -14091,7 +14091,7 @@ in case we run the same combination more than once</p>
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[117]:</div>
+    <div class="prompt output_prompt">Out[138]:</div>
 
 
 
@@ -14116,13 +14116,12 @@ in case we run the same combination more than once</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[122]:</div>
+<div class="prompt input_prompt">In&nbsp;[142]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Plot the lines of average accuracies with min-max values</span>
-<span class="k">for</span> <span class="n">step</span><span class="p">,</span> <span class="n">acc</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">steps</span><span class="p">,</span> <span class="n">accuracies</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">step</span><span class="p">,</span> <span class="n">acc</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">steps_str</span><span class="p">,</span> <span class="n">accuracies</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models_str</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
         <span class="n">result_plot</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">selection_functions_str</span><span class="p">,</span> <span class="n">acc</span><span class="p">)</span>         
 </pre></div>
 
@@ -14139,17 +14138,6 @@ in case we run the same combination more than once</p>
     <div class="prompt"></div>
 
 
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>RF
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
 
 
 <div class="output_png output_subarea ">
@@ -14158,17 +14146,6 @@ in case we run the same combination more than once</p>
 >
 </div>
 
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>LogReg
-</pre>
-</div>
 </div>
 
 <div class="output_area">
@@ -14191,17 +14168,6 @@ in case we run the same combination more than once</p>
     <div class="prompt"></div>
 
 
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>SVM
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
 
 
 <div class="output_png output_subarea ">
@@ -14210,17 +14176,6 @@ in case we run the same combination more than once</p>
 >
 </div>
 
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>RF
-</pre>
-</div>
 </div>
 
 <div class="output_area">
@@ -14243,17 +14198,6 @@ in case we run the same combination more than once</p>
     <div class="prompt"></div>
 
 
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>LogReg
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
 
 
 <div class="output_png output_subarea ">
@@ -14262,17 +14206,6 @@ in case we run the same combination more than once</p>
 >
 </div>
 
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>SVM
-</pre>
-</div>
 </div>
 
 <div class="output_area">
@@ -14295,17 +14228,6 @@ in case we run the same combination more than once</p>
     <div class="prompt"></div>
 
 
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>RF
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
 
 
 <div class="output_png output_subarea ">
@@ -14321,17 +14243,6 @@ in case we run the same combination more than once</p>
     <div class="prompt"></div>
 
 
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>LogReg
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
 
 
 <div class="output_png output_subarea ">
@@ -14340,17 +14251,6 @@ in case we run the same combination more than once</p>
 >
 </div>
 
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>SVM
-</pre>
-</div>
 </div>
 
 <div class="output_area">
