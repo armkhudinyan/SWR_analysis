@@ -158,7 +158,7 @@ Support Vector Machine
 def SVM():
     param = {
             'C': 1,
-            'kernel': 'rbf',
+            'kernel': 'linear',
             'probability': True,
             'gamma': 'auto'
             }
