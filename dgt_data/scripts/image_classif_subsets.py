@@ -18,9 +18,9 @@ from rasterio.plot import show
 from rasterio import features
 from rasterio import Affine 
 #import geopandas as gpd
-import gdal
-import ogr
-from shapely.geometry import Point
+#import gdal
+#import ogr
+#from shapely.geometry import Point
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.impute import SimpleImputer 
 
@@ -31,7 +31,7 @@ import pickle
 # Defining paths
 #===================
 #sys.path.append(join(dirname(__file__), '..', '..'))
-PATH = r'C:\Users\arman\Desktop\ActiveLearning\Experiment\dgt_joao'
+PATH = r'C:\Users\mkhudinyan\Desktop\GitHub\active-learning\dgt_data'
 
 SENTINEL_PATH = r'\\dgt-759\S2_2018\Theia_S2process\T29SND\composites'
 METRICS_PATH = join(SENTINEL_PATH, 'metrics')
@@ -135,7 +135,7 @@ bands_list = []
 bands_names = []
 
 # load indices and metrics arrays
-for raster in best_ind_metr_path[:2]:
+for raster in best_ind_metr_path:
     src = rasterio.open(raster)
     out_meta = src.meta.copy()
     proj = src.crs
@@ -145,10 +145,11 @@ for raster in best_ind_metr_path[:2]:
     band = src.read(1)
     bands_list.append(band)
     bands_names.append(band_name)
+    print(f'Loaded raster {raster.split("\\")[-1]}')
     del band
 
 # load bends arrays
-for band_name in best_bands[:2]:
+for band_name in best_bands:
     search = f'{band_name.split(".")[0]}.tif'
     band_n = int(band_name.split(".")[1])
     ras_path = join(SENTINEL_PATH, search)
@@ -157,6 +158,7 @@ for band_name in best_bands[:2]:
     band = src.read(band_n)
     bands_list.append(band)
     bands_names.append(band_name)
+    print(f'Loaded raster {band_name.split("\\")[-1]}')
     del band
 
 '''
@@ -233,11 +235,14 @@ flat_pixels_subsets = np.array_split(flat_pixels, 20)
 pred_results = []
 uncert_results = []
 
+i = 1
 for subset in flat_pixels_subsets:
     y_probab, predicted = RF(X_train, y_train, subset)
     uncertainty = MarginSamplingSelection(y_probab)
     pred_results.append(predicted)
     uncert_results.append(uncertainty)
+    print(f'subset {i} is classified')
+    i +=1
 
 classification = np.concatenate(pred_results)
 uncertainty = np.concatenate(uncert_results)
