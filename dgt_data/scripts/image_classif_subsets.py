@@ -135,7 +135,7 @@ bands_list = []
 bands_names = []
 
 # load indices and metrics arrays
-for raster in best_ind_metr_path:
+for raster in best_ind_metr_path[:2]:
     src = rasterio.open(raster)
     out_meta = src.meta.copy()
     proj = src.crs
@@ -145,11 +145,11 @@ for raster in best_ind_metr_path:
     band = src.read(1)
     bands_list.append(band)
     bands_names.append(band_name)
-    print(f'Loaded raster {raster.split("\\")[-1]}')
+    print('Loaded raster', raster.split('\\')[-1])
     del band
 
 # load bends arrays
-for band_name in best_bands:
+for band_name in best_bands[:2]:
     search = f'{band_name.split(".")[0]}.tif'
     band_n = int(band_name.split(".")[1])
     ras_path = join(SENTINEL_PATH, search)
@@ -158,7 +158,7 @@ for band_name in best_bands:
     band = src.read(band_n)
     bands_list.append(band)
     bands_names.append(band_name)
-    print(f'Loaded raster {band_name.split("\\")[-1]}')
+    print('Loaded raster', band_name.split('\\')[-1])
     del band
 
 '''
@@ -195,6 +195,7 @@ df_stack = pd.DataFrame(flat_pixels, columns=bands_names )
 # Loading the training data
 #==============================
 train_data = pd.read_csv(TRAIN_PATH, index_col=0)
+train_data2 = train_data.loc[:, ['classes'] + bands_names] #.values
 
 # filling the missing values
 #imputer = SimpleImputer(missing_values = np.nan, strategy ="mean") 
@@ -205,10 +206,8 @@ X_train = train_data.iloc[:, 1:].values
 
 y_train = train_data.iloc[:, 0].values
 
-
 # organize classification data
-col_order = train_data.columns[1:]
-image_array = df_stack.loc[:, col_order].values
+image_array = df_stack.values
 
 #==============================
 # Split data into subsets 
