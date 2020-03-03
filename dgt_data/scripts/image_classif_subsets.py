@@ -63,7 +63,7 @@ def pickle_load(fname):
 #=======================CLASSIFICATION MODELS==================================
 def RF(X_train, y_train, image_array):
     '''Random Forest Classifier'''
-    classifier = RandomForestClassifier(n_estimators=500, n_jobs=-1)
+    classifier = RandomForestClassifier(n_estimators=500, n_jobs=34)
     classifier.fit(X_train, y_train)
     y_probab = classifier.predict_proba(image_array)
     predicted = classifier.predict(image_array)
@@ -135,7 +135,7 @@ bands_list = []
 bands_names = []
 
 # load indices and metrics arrays
-for raster in best_ind_metr_path[:2]:
+for raster in best_ind_metr_path:
     src = rasterio.open(raster)
     out_meta = src.meta.copy()
     proj = src.crs
@@ -149,7 +149,7 @@ for raster in best_ind_metr_path[:2]:
     del band
 
 # load bends arrays
-for band_name in best_bands[:2]:
+for band_name in best_bands:
     search = f'{band_name.split(".")[0]}.tif'
     band_n = int(band_name.split(".")[1])
     ras_path = join(SENTINEL_PATH, search)
@@ -178,13 +178,16 @@ _, _, n_bands = data_stack.shape
 n_pixels = rows*(cols)
 # stack bands as columns each (2D)
 flat_pixels = data_stack.reshape((n_pixels, n_bands))
+del data_stack
+
 # fill missing values 
-df_stack = pd.DataFrame(flat_pixels, columns=bands_names )
+#df_stack = pd.DataFrame(flat_pixels, columns=bands_names)
 
 #df_stack = pd.DataFrame(flat_pixels).fillna(method='bfill', axis=0)
 #flat_pixels = df_stack.values
 #del data_stack
 
+# Unmute in case for classificationnot a complete tile
 # drop Nones using the rasterised COS
 #index = np.argwhere(flat_pixels[:,0]==-1)
 #all_stack = np.delete(flat_pixels, index, axis = 0)
@@ -195,19 +198,33 @@ df_stack = pd.DataFrame(flat_pixels, columns=bands_names )
 # Loading the training data
 #==============================
 train_data = pd.read_csv(TRAIN_PATH, index_col=0)
-train_data2 = train_data.loc[:, ['classes'] + bands_names] #.values
+colnames = list(train_data.columns )
+new_colnames = [name.replace('Portugal','T29SND') for name in colnames]
+train_data = pd.DataFrame(train_data.values, columns = new_colnames)
+# reorder the colums names to ,atch with loaded bands order
+train_data = train_data.loc[:, ['classes'] + bands_names]
+
 
 # filling the missing values
 #imputer = SimpleImputer(missing_values = np.nan, strategy ="mean") 
 
 X_train = train_data.iloc[:, 1:].values
-#imputer1 = imputer.fit(x_train) 
-#x_train = imputer1.transform(x_train) 
+#imputer1 = imputer.fit(X_train) 
+#X_train = imputer1.transform(X_train) 
 
 y_train = train_data.iloc[:, 0].values
 
 # organize classification data
-image_array = df_stack.values
+#image_array = df_stack.values
+
+#==============================
+# Train RF model and classify image
+#==============================
+#y_probab, predicted = RF(X_train, y_train, image_array)
+
+# Mapping the uncertainty
+#uncertainty = MarginSamplingSelection(y_probab)
+
 
 #==============================
 # Split data into subsets 
@@ -220,26 +237,15 @@ flat_pixels_subsets = np.array_split(flat_pixels, 20)
 # into memory you may need to increase this number.
 # The output is a list of arrays
 
-#==============================
-# Train RF model and classify image
-#==============================
-#y_probab, predicted = RF(X_train, y_train, image_array)
-
-# Mapping the uncertainty
-#uncertainty = MarginSamplingSelection(y_probab)
-
-#==============================
-# Train RF model and classify image
-#==============================
 pred_results = []
 uncert_results = []
 
 i = 1
 for subset in flat_pixels_subsets:
     y_probab, predicted = RF(X_train, y_train, subset)
-    uncertainty = MarginSamplingSelection(y_probab)
+    uncert = MarginSamplingSelection(y_probab)
     pred_results.append(predicted)
-    uncert_results.append(uncertainty)
+    uncert_results.append(uncert)
     print(f'subset {i} is classified')
     i +=1
 
