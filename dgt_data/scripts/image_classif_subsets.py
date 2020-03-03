@@ -71,9 +71,10 @@ def RF(X_train, y_train, image_array):
 
 #=======================UNCERTAINTY MAPPING====================================
 def MarginSamplingSelection(y_probab):
-    ''' Uncertainty with Margine sampling '''
-    # Selecting Margine samples as a smallest difference of probability values
-    # between the first and second most probabel classes
+    ''' Uncertainty with Margine sampling 
+    Selecting Margine samples as a smallest difference of probability values
+    between the first and second most probabel classes
+    '''
     rev = np.sort(y_probab, axis=1)[:, ::-1]
     uncertainty = rev[:, 0] - rev[:, 1]
     #selection = np.argsort(values)[:step]
@@ -172,12 +173,12 @@ bands_list.append(yy)
 '''
 # make a d-stack array from the bands (3D)
 data_stack = np.dstack(bands_list)
-
 _, _, n_bands = data_stack.shape
 # number of pixels on one band
 n_pixels = rows*(cols)
 # stack bands as columns each (2D)
 flat_pixels = data_stack.reshape((n_pixels, n_bands))
+del bands_list
 del data_stack
 
 # fill missing values 
@@ -187,7 +188,7 @@ del data_stack
 #flat_pixels = df_stack.values
 #del data_stack
 
-# Unmute in case for classificationnot a complete tile
+# Unmute in case for classificationnot an uncomplete tile
 # drop Nones using the rasterised COS
 #index = np.argwhere(flat_pixels[:,0]==-1)
 #all_stack = np.delete(flat_pixels, index, axis = 0)
@@ -198,41 +199,26 @@ del data_stack
 # Loading the training data
 #==============================
 train_data = pd.read_csv(TRAIN_PATH, index_col=0)
+'''
+# changing names from Portugal T29SND
 colnames = list(train_data.columns )
 new_colnames = [name.replace('Portugal','T29SND') for name in colnames]
 train_data = pd.DataFrame(train_data.values, columns = new_colnames)
+'''
 # reorder the colums names to ,atch with loaded bands order
 train_data = train_data.loc[:, ['classes'] + bands_names]
 
-
-# filling the missing values
-#imputer = SimpleImputer(missing_values = np.nan, strategy ="mean") 
-
 X_train = train_data.iloc[:, 1:].values
-#imputer1 = imputer.fit(X_train) 
-#X_train = imputer1.transform(X_train) 
-
 y_train = train_data.iloc[:, 0].values
-
-# organize classification data
-#image_array = df_stack.values
-
-#==============================
-# Train RF model and classify image
-#==============================
-#y_probab, predicted = RF(X_train, y_train, image_array)
-
-# Mapping the uncertainty
-#uncertainty = MarginSamplingSelection(y_probab)
-
 
 #==============================
 # Split data into subsets 
+# Train RF model and classify image
 #==============================
 #In order to avoind from memory error, the long array can be splittet
 #into subsets, then classified separatelly and reshapped into one in the end
 
-flat_pixels_subsets = np.array_split(flat_pixels, 20)
+flat_pixels_subsets = np.array_split(flat_pixels, 40)
 # The second argument is the number of subsets. If it still doesn't fit
 # into memory you may need to increase this number.
 # The output is a list of arrays
@@ -254,7 +240,8 @@ uncertainty = np.concatenate(uncert_results)
 
 '''
 #==============================
-# Save classification and uncertainty maps
+# Recover the raster shape in case 
+# classifying an uncomplete tile
 #==============================
 
 # make dataframe from arrays containing raster x and y 
@@ -291,7 +278,7 @@ uncert_map  = np.reshape(df_uncert.loc['uncert_new'].values, (rows, cols))
 '''
 
 # in case there is no missing values and output array is equal to raster array
-classif_map = np.reshape(classification.astype('float32'), (rows, cols))
+classif_map = np.reshape(classification.astype('int32'), (rows, cols))
 uncert_map  = np.reshape(uncertainty.astype('float32'), (rows, cols))
 
 #=====================
@@ -302,7 +289,7 @@ out_meta  = src.meta.copy()
 
 out_meta.update({
                "driver": "GTiff",
-               "dtype" : 'float32',
+               "dtype" : 'int32',
                "nodata": None, #np.nan,
                "height": src.height,
                "width" : src.width,
@@ -314,32 +301,16 @@ out_meta.update({
                "crs":  out_meta['crs']
               })
           
-# Write the raster to disk
+# Write the array to raster GeoTIF 
 with rasterio.open(join(OUT_PATH, 'lulc_0.tif'), "w", **out_meta) as dest:
     dest.write(classif_map, indexes=1)  
 
 with rasterio.open(join(OUT_PATH, 'uncertainty_0.tif'), "w", **out_meta) as dest:
     dest.write(uncert_map, indexes=1)  
 
-
-'''
-# Output the simulated landcover raster
-def write_geotiff(dest_path, data, geo_transform, projection):
-    #"""Create a GeoTIFF file with the given data."""
-    driver= gdal.GetDriverByName('GTiff')
-    rows, cols= data.shape
-    dataset= driver.Create(dest_path, cols, rows, 1, gdal.GDT_Float32)
-    dataset.SetGeoTransform(geo_transform)
-    dataset.SetProjection(projection)
-    band= dataset.GetRasterBand(1)
-    band.WriteArray(data)
-    dataset=None
-    
-# write and close the file for 2028 Business as usual
-write_geotiff(dest_path = join(out_path, 'data', 'lulc_1.tif'),        classif_map, transform, proj)
-write_geotiff(dest_path = join(out_path, 'data', 'uncertainty_1.tif'), uncert_map,  transform, proj)
-'''
-
+#=====================
+# Save training time
+#=====================
 # recrd the experiment time
 t1 = time.time()
 run_time = round((t1-t0)/60, 2)
@@ -350,7 +321,7 @@ experiment_time['run_time']= []
 experiment_time['run_time'].append(run_time)
 
 # save pickled disctionary with results
-name = 'run_time_sampling'
+name = 'run_time'
 pickle_save(name, experiment_time)
 
 
