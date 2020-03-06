@@ -46,10 +46,37 @@ largest_patches = gdf_uncert.groupby('classes')\
                .apply(lambda x: x.sort_values(by='Area', ascending=False)\
                .iloc[:df.loc[df['classes']== x['classes'].iloc[0], 'size'].iloc[0],:])\
                .reset_index(drop=True)
-    
-# specify the directory to save save the shapefile
-os.chdir(r'C:\Users\arman\Desktop\ActiveLearning\Experiment\dgt_T29SND\delete')
-largest_patches.to_file('uncert_10_pathches2.shp')
+
+# drop classes "Irrigated" and "Rainfed" (-1 and -2)
+largest_patches = largest_patches[~largest_patches['classes'].isin([-1,-2])]
+print('class sizes' ,largest_patches.groupby("Nomenclatu").size())
+
+# specify the directory to save the shapefile
+os.chdir(shp_path)
+largest_patches.to_file('uncert_10_pathches.shp')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

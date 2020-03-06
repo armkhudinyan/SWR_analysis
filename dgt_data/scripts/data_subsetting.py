@@ -58,6 +58,8 @@ def pickle_load(fname):
 t0 = time.time()
 # fixing the random seed for reproducibility
 seed=np.random.seed(7)
+# number of samples per class
+n_sample = 250
 
 #==============================
 # load csv files
@@ -90,8 +92,8 @@ to_list = [class_size_dict[keys] for keys in class_size_dict]
 sample_size = []
 
 for i in to_list:
-    if i >250:
-        sample_size.append(250)
+    if i > n_sample:
+        sample_size.append(n_sample)
     else:
         sample_size.append(i)
 
