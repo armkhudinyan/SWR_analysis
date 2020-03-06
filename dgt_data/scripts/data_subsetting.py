@@ -64,7 +64,8 @@ seed=np.random.seed(7)
 #==============================
 # make a list with all raster's paths
 all_train = pd.read_csv(all_train_path, index_col=0)
-print('Classes', class_names = all_train.class_decoded.unique().tolist())
+class_names = all_train.class_decoded.unique().tolist()
+print('Classes', class_names)
 xy_29SND = pd.read_csv(xy_29SND_path)
 
 xy_29SND = xy_29SND.drop(columns =['class', 'y_geo', 'x_geo', 'class_deco'])
