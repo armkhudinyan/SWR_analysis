@@ -5,15 +5,15 @@ Created on Thu Mar  5 23:50:08 2020
 @author: arman
 """
 import os
-from os.path import join, dirname
+from os.path import join
 import pandas as pd
 import geopandas as gpd
 
-shp_path = r'C:\Users\arman\Desktop\ActiveLearning\Experiment\dgt_T29SND\delete'
-gdf_uncert = gpd.read_file(join(shp_path,'uncert_intersect.shp'))
+PATH = r'C:\Users\arman\Desktop\ActiveLearning\Experiment\dgt_T29SND\delete'
+gdf_uncert = gpd.read_file(join(PATH,'uncert_intersect.shp'))
 
 # define the amount of patches to be selected per class
-patch_num = 10
+n_patches = 10
 
 #==============================
 # Make dataframe containing class names and class IDs
@@ -31,8 +31,8 @@ to_list = [class_size_dict[keys] for keys in class_size_dict]
 sample_size = []
 
 for i in to_list:
-    if i > patch_num:
-        sample_size.append(patch_num)
+    if i > n_patches:
+        sample_size.append(n_patches)
     else:
         sample_size.append(i)
 
@@ -52,8 +52,8 @@ largest_patches = largest_patches[~largest_patches['classes'].isin([-1,-2])]
 print('class sizes' ,largest_patches.groupby("Nomenclatu").size())
 
 # specify the directory to save the shapefile
-os.chdir(shp_path)
-largest_patches.to_file('uncert_10_pathches.shp')
+os.chdir(PATH)
+largest_patches.to_file(f'uncert_{n_patches}_pathches.shp')
 
 
 

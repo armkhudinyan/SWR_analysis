@@ -27,20 +27,21 @@ from sklearn.impute import SimpleImputer
 import glob
 from collections import Counter
 import pickle
+
+# define the sequential number of AL procedure
+n_run = 0
 #===================
 # Defining paths
 #===================
 #sys.path.append(join(dirname(__file__), '..', '..'))
-PATH = r'C:\Users\mkhudinyan\Desktop\GitHub\active-learning\dgt_data'
+PATH = r'C:\Users\arman\Documents\GitHub\active-learning\AL_T29SND'
 
 SENTINEL_PATH = r'\\dgt-759\S2_2018\Theia_S2process\T29SND\composites'
 METRICS_PATH = join(SENTINEL_PATH, 'metrics')
 INDICES_PATH = join(SENTINEL_PATH, 'indices')
 #INDICES_METRICS_PATH = join(SENTINEL_PATH, 'indices', 'metrics')
-
 TRAIN_PATH = join(PATH, 'train_data','train_best_40.csv')
 FEATURE_NAME_PATH = join(PATH, 'feature_importance', 'feature_rankings.csv')
-
 OUT_PATH = join(PATH, 'results')
 
 #==============================================================================
@@ -302,10 +303,10 @@ out_meta.update({
               })
           
 # Write the array to raster GeoTIF 
-with rasterio.open(join(OUT_PATH, 'lulc_0.tif'), "w", **out_meta) as dest:
+with rasterio.open(join(OUT_PATH, f'lulc_{n_run}.tif'), "w", **out_meta) as dest:
     dest.write(classif_map, indexes=1)  
 
-with rasterio.open(join(OUT_PATH, 'uncertainty_0.tif'), "w", **out_meta) as dest:
+with rasterio.open(join(OUT_PATH, f'uncertainty_{n_run}.tif'), "w", **out_meta) as dest:
     dest.write(uncert_map, indexes=1)  
 
 #=====================

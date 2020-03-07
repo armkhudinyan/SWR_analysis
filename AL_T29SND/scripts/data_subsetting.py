@@ -30,7 +30,7 @@ import pickle
 # Defining paths
 #===================
 #sys.path.append(join(dirname(__file__), '..', '..'))
-PATH = r'C:\Users\arman\Desktop\ActiveLearning\Experiment\dgt_joao'
+PATH = r'C:\Users\arman\Desktop\ActiveLearning\Experiment\dgt_T29SND'
 
 all_train_path = join(PATH, 'train_data', 'sampled_point_coordinates_s2.csv')
 xy_29SND_path = join(PATH, 'train_data', 'sample_xy_29SND.csv')
@@ -58,7 +58,7 @@ def pickle_load(fname):
 t0 = time.time()
 # fixing the random seed for reproducibility
 seed=np.random.seed(7)
-# number of samples per class
+# number of samples per class to be randomly selected
 n_sample = 250
 
 #==============================
@@ -111,7 +111,6 @@ train_29SND.to_csv(join(out_path,"train_29SND.csv"), sep=',',header=True, index=
 #==============================
 # Select The most important features for classification
 #==============================
-
 feat_ranking = pd.read_csv(join(PATH, 'feature_importance', 'feature_rankings.csv'))
 train_29SND = pd.read_csv(join(out_path, 'train_29SND.csv'))
 
