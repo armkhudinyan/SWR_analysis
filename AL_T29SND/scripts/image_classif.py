@@ -285,25 +285,6 @@ with rasterio.open(join(OUT_PATH, 'lulc_0.tif'), "w", **out_meta) as dest:
 with rasterio.open(join(OUT_PATH, 'uncertainty_0.tif'), "w", **out_meta) as dest:
     dest.write(uncert_map, indexes=1)  
 
-
-'''
-# Output the simulated landcover raster
-def write_geotiff(dest_path, data, geo_transform, projection):
-    #"""Create a GeoTIFF file with the given data."""
-    driver= gdal.GetDriverByName('GTiff')
-    rows, cols= data.shape
-    dataset= driver.Create(dest_path, cols, rows, 1, gdal.GDT_Float32)
-    dataset.SetGeoTransform(geo_transform)
-    dataset.SetProjection(projection)
-    band= dataset.GetRasterBand(1)
-    band.WriteArray(data)
-    dataset=None
-    
-# write and close the file for 2028 Business as usual
-write_geotiff(dest_path = join(out_path, 'data', 'lulc_1.tif'),        classif_map, transform, proj)
-write_geotiff(dest_path = join(out_path, 'data', 'uncertainty_1.tif'), uncert_map,  transform, proj)
-'''
-
 # recrd the experiment time
 t1 = time.time()
 run_time = round((t1-t0)/60, 2)
@@ -316,7 +297,6 @@ experiment_time['run_time'].append(run_time)
 # save pickled disctionary with results
 name = 'run_time_sampling'
 pickle_save(name, experiment_time)
-
 
 print('Training time:', round((t1-t0)/60,2), 'mins')
 

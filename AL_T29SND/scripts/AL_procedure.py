@@ -64,7 +64,7 @@ def pickle_load(fname):
 #=======================CLASSIFICATION MODELS==================================
 def RF(X_train, y_train, image_array):
     '''Random Forest Classifier'''
-    classifier = RandomForestClassifier(n_estimators=500, n_jobs=34)
+    classifier = RandomForestClassifier(n_estimators=300, n_jobs=34)
     classifier.fit(X_train, y_train)
     y_probab = classifier.predict_proba(image_array)
     predicted = classifier.predict(image_array)
@@ -324,7 +324,6 @@ experiment_time['run_time'].append(run_time)
 # save pickled disctionary with results
 name = 'run_time'
 pickle_save(name, experiment_time)
-
 
 print('Training time:', round((t1-t0)/60,2), 'mins')
 

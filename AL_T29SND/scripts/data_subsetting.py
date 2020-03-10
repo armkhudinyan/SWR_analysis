@@ -64,7 +64,6 @@ n_sample = 250
 #==============================
 # load csv files
 #==============================
-# make a list with all raster's paths
 all_train = pd.read_csv(all_train_path, index_col=0)
 class_names = all_train.class_decoded.unique().tolist()
 print('Classes', class_names)
