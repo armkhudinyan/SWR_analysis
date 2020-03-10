@@ -57,7 +57,7 @@ train_initial_29SND = pd.read_csv(join(PATH, 'train_data', 'train_initial_29SND.
 #leave the samples not included in the initial train
 candidate_samples = all_29SND_best_feat.loc[~all_29SND_best_feat['Object_ID'].isin(train_initial_29SND['Object_ID'].values)]
 
-
+#=============================================================================
 # subsetting the training data
 class_id = sorted(candidate_samples.classes.unique().tolist())
 class_size = candidate_samples.groupby('classes').size()
@@ -215,15 +215,41 @@ df_sampled['y_geo'] = geo_coords.apply(lambda x: x[1])
 
 # drop pixel coords for raster
 df_sampled = df_sampled.drop(columns=['x','y'])
+df_sampled.classes = df_sampled.classes.astype(int)
+
+'''
+# rearrange the columns names to match the other dataframes
+'''
+#=============================================================================
+# subsetting the training data
+class_id2 = sorted(df_sampled.classes.unique().tolist())
+class_size2 = df_sampled.groupby('classes').size()
+class_size_dict2 = dict(class_size2)
+
+to_list2 = [class_size_dict2[keys] for keys in class_size_dict2]  
+
+# create list containing sample size per class
+sample_size2 = []
+
+for i in to_list2:
+    if i > n_sample:
+        sample_size2.append(n_sample)
+    else:
+        sample_size2.append(i)
+
+df2 = pd.DataFrame({'classes':class_id2, 'size':sample_size2})
+
+# sample data by given sample size
+train_selec_1_29SND =  df_sampled.groupby('classes')\
+                   .apply(lambda x: x.sample(df2.loc[df2['classes']== x['classes'].iloc[0], 'size'].iloc[0]))\
+                   .reset_index(drop=True)
 
 #================================================
 # Concatinate the parts of training data into one
 #================================================
 
-train_data_1 = pd.concat((train_initial_29SND, agri_samples, df_sampled), axis = 0)
-
-OUT_PATH = join(PATH, 'train_data')
-
+train_data_1 = pd.concat((train_initial_29SND.drop(columns=['Object_ID']),\
+                          agri_samples.drop(columns=['Object_ID']), df_sampled), axis = 0)
 
 train_data_1.to_csv(join(PATH, 'train_data', 'train_data_1.csv'), sep=',',header=True, index=True)
 
