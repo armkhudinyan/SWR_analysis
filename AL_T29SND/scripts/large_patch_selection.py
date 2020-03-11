@@ -19,7 +19,8 @@ n_patches = 10
 # Make dataframe containing class names and class IDs
 #==============================
 print('class sizes' ,gdf_uncert.groupby("Nomenclatu").size())
-#gdf_uncert.groupby("classes").size()
+# Recalculate polygon areas 
+gdf_uncert['Area'] = gdf_uncert.geometry.area
 
 class_id = sorted(gdf_uncert.classes.unique().tolist()) # should be sorted to match with class_size order
 class_size = gdf_uncert.groupby('classes').size()
