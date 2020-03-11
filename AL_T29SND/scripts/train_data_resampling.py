@@ -16,21 +16,16 @@ import rasterio
 from rasterio.plot import show
 from rasterio import features
 from rasterio import Affine 
-import shapely
-import geopandas as gpd
-import gdal
-import ogr
-from shapely.geometry import Point
 from sklearn.impute import SimpleImputer 
-
 import glob
-from collections import Counter
-import pickle
+
 #===================
 # Defining paths
 #===================
 #sys.path.append(join(dirname(__file__), '..', '..'))
-PATH = r'C:\Users\arman\Desktop\ActiveLearning\Experiment\dgt_T29SND'
+#PATH = r'C:\Users\arman\Desktop\ActiveLearning\Experiment\dgt_T29SND'
+PATH = r'C:\Users\mkhudinyan\Desktop\GitHub\active-learning\AL_T29SND'
+
 FEATURE_NAME_PATH = join(PATH, 'feature_importance', 'feature_rankings.csv')
 all_29SND_path = join(PATH, 'train_data', 'all_29SND_best_feat.csv')
 LABEL_RASTER_PATH = join(PATH, 'truth_rasters', 'truth_patches_0.tif')
@@ -54,7 +49,7 @@ all_29SND_best_feat = pd.read_csv(all_29SND_path, index_col=0)
 # load the initial train samples
 train_initial_29SND = pd.read_csv(join(PATH, 'train_data', 'train_initial_29SND.csv'), index_col=0)
 # subtract intial train from all samples of 29SND to 
-#leave the samples not included in the initial train
+# get the samples not included in the initial train
 candidate_samples = all_29SND_best_feat.loc[~all_29SND_best_feat['Object_ID'].isin(train_initial_29SND['Object_ID'].values)]
 
 #=============================================================================
@@ -88,8 +83,6 @@ agri_classes = [9,10,11,12,13,14,15,16,17,18] # 10 classes
 agri_samples = new_train_29SND.loc[new_train_29SND['classes'].isin(agri_classes)]
 
 agri_samples.to_csv(join(PATH, 'train_data', 'agri_samples_1_sel.csv'), sep=',',header=True, index=True)
-
-
 
 #================================================================
 # Sampling the photointerpreted pixels 
@@ -133,6 +126,7 @@ bands_names = []
 LABEL_RASTER = rasterio.open(LABEL_RASTER_PATH)
 bands_list.append(LABEL_RASTER.read(1))
 bands_names.append('classes')
+print('Loaded raster classes')
 
 # load indices and metrics arrays
 for raster in best_ind_metr_path:
@@ -220,6 +214,9 @@ df_sampled.classes = df_sampled.classes.astype(int)
 '''
 # rearrange the columns names to match the other dataframes
 '''
+columns_order = agri_samples.drop(columns = 'Object_ID').columns.tolist()
+df_sampled = df_sampled.loc[:, columns_order]
+
 #=============================================================================
 # subsetting the training data
 class_id2 = sorted(df_sampled.classes.unique().tolist())
@@ -240,16 +237,17 @@ for i in to_list2:
 df2 = pd.DataFrame({'classes':class_id2, 'size':sample_size2})
 
 # sample data by given sample size
-train_selec_1_29SND =  df_sampled.groupby('classes')\
+active_selected_1_29SND =  df_sampled.groupby('classes')\
                    .apply(lambda x: x.sample(df2.loc[df2['classes']== x['classes'].iloc[0], 'size'].iloc[0]))\
                    .reset_index(drop=True)
 
+active_selected_1_29SND.to_csv(join(PATH, 'train_data', 'active_selected_1_29SND.csv'), sep=',',header=True, index=True)
 #================================================
 # Concatinate the parts of training data into one
 #================================================
 
 train_data_1 = pd.concat((train_initial_29SND.drop(columns=['Object_ID']),\
-                          agri_samples.drop(columns=['Object_ID']), df_sampled), axis = 0)
+                          agri_samples.drop(columns=['Object_ID']), active_selected_1_29SND), axis = 0,  ignore_index=True)
 
 train_data_1.to_csv(join(PATH, 'train_data', 'train_data_1.csv'), sep=',',header=True, index=True)
 

@@ -29,18 +29,18 @@ from collections import Counter
 import pickle
 
 # define the sequential number of AL procedure
-n_run = 0
+n_run = 1
 #===================
 # Defining paths
 #===================
 #sys.path.append(join(dirname(__file__), '..', '..'))
-PATH = r'C:\Users\arman\Documents\GitHub\active-learning\AL_T29SND'
+PATH = r'C:\Users\mkhudinyan\Desktop\GitHub\active-learning\AL_T29SND'
 
 SENTINEL_PATH = r'\\dgt-759\S2_2018\Theia_S2process\T29SND\composites'
 METRICS_PATH = join(SENTINEL_PATH, 'metrics')
 INDICES_PATH = join(SENTINEL_PATH, 'indices')
 #INDICES_METRICS_PATH = join(SENTINEL_PATH, 'indices', 'metrics')
-TRAIN_PATH = join(PATH, 'train_data','train_best_40.csv')
+TRAIN_PATH = join(PATH, 'train_data','train_data_1.csv')
 FEATURE_NAME_PATH = join(PATH, 'feature_importance', 'feature_rankings.csv')
 OUT_PATH = join(PATH, 'results')
 
@@ -207,6 +207,7 @@ new_colnames = [name.replace('Portugal','T29SND') for name in colnames]
 train_data = pd.DataFrame(train_data.values, columns = new_colnames)
 '''
 # reorder the colums names to ,atch with loaded bands order
+train_data = train_data.drop(columns = ['y_geo', 'x_geo'])
 train_data = train_data.loc[:, ['classes'] + bands_names]
 
 X_train = train_data.iloc[:, 1:].values
@@ -279,7 +280,7 @@ uncert_map  = np.reshape(df_uncert.loc['uncert_new'].values, (rows, cols))
 '''
 
 # in case there is no missing values and output array is equal to raster array
-classif_map = np.reshape(classification.astype('int32'), (rows, cols))
+classif_map = np.reshape(classification.astype('float32'), (rows, cols))
 uncert_map  = np.reshape(uncertainty.astype('float32'), (rows, cols))
 
 #=====================
@@ -290,7 +291,7 @@ out_meta  = src.meta.copy()
 
 out_meta.update({
                "driver": "GTiff",
-               "dtype" : 'int32',
+               "dtype" : 'float32',
                "nodata": None, #np.nan,
                "height": src.height,
                "width" : src.width,
@@ -322,7 +323,7 @@ experiment_time['run_time']= []
 experiment_time['run_time'].append(run_time)
 
 # save pickled disctionary with results
-name = 'run_time'
+name = f'run_time_{n_run}'
 pickle_save(name, experiment_time)
 
 print('Training time:', round((t1-t0)/60,2), 'mins')
