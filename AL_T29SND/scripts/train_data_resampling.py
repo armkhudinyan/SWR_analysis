@@ -242,12 +242,13 @@ active_selected_1_29SND =  df_sampled.groupby('classes')\
                    .reset_index(drop=True)
 
 active_selected_1_29SND.to_csv(join(PATH, 'train_data', 'active_selected_1_29SND.csv'), sep=',',header=True, index=True)
+
 #================================================
 # Concatinate the parts of training data into one
 #================================================
-
 train_data_1 = pd.concat((train_initial_29SND.drop(columns=['Object_ID']),\
-                          agri_samples.drop(columns=['Object_ID']), active_selected_1_29SND), axis = 0,  ignore_index=True)
+                          agri_samples.drop(columns=['Object_ID']),\
+                          active_selected_1_29SND), axis = 0,  ignore_index=True)
 
 train_data_1.to_csv(join(PATH, 'train_data', 'train_data_1.csv'), sep=',',header=True, index=True)
 
