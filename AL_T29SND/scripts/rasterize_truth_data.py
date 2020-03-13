@@ -22,7 +22,7 @@ import geopandas as gpd
 import gdal
 import ogr
 
-from sklearn.impute import SimpleImputer 
+from sklearn.impute import SimpleImputer
 import matplotlib.pyplot as plt
 import glob
 import seaborn as sns
@@ -33,6 +33,9 @@ from collections import Counter
 #===================
 #sys.path.append(join(dirname(__file__), '..', '..'))
 #PATH = r'C:\Users\arman\Documents\GitHub\active-learning\AL_T29SND'
+
+n_run = 1
+
 PATH = r'C:\Users\arman\Desktop\ActiveLearning\Experiment\dgt_T29SND'
 
 SENTINEL_PATH = r'\\dgt-759\S2_2018\Theia_S2process\T29SND\composites'
@@ -43,9 +46,9 @@ TRAIN_PATH = join(PATH, 'train_data','train_best_40.csv')
 FEATURE_NAME_PATH = join(PATH, 'feature_importance', 'feature_rankings.csv')
 
 
-SHAPE_PATH = join(PATH,  'truth_patches', 'truth_patches_0.shp')
+SHAPE_PATH = join(PATH,  'truth_patches', f'truth_patches_{n_run}.shp')
 
-OUT_PATH = join(PATH, 'truth_rasters')
+OUT_PATH = join(PATH, 'truth_rasters', f'truth_patches_{n_run+1}.tif')
 
 #==============================
 # rasterize shapefiles
@@ -56,14 +59,14 @@ truth_patches = gpd.read_file(SHAPE_PATH)
 
 # get a raster from the proper tile for the extents and metadata
 search_criteria = "*.tif"
-querie = join(METRICS_PATH, search_criteria)   
+querie = join(METRICS_PATH, search_criteria)
 raster_path = glob.glob(querie)
 
 src = rasterio.open(raster_path[0])
 proj = src.crs
 out_meta = src.meta.copy()
 
-# First of all check the coordinate reference systems of the files 
+# First of all check the coordinate reference systems of the files
 print('truth_patches proj:', truth_patches.crs)
 print('raster proj:', src.crs)
 # In case of missmatching, the layers should be transformed into one crs
@@ -112,13 +115,13 @@ shapes = [
 out_shape = src.shape
 transform = src.transform
 #out_meta  = src.meta
-# 'shapes' in rasterio.rasterize  is iterable of (geometry, value) pairs 
+# 'shapes' in rasterio.rasterize  is iterable of (geometry, value) pairs
 # or iterable over
 
 array_to_rast = features.rasterize(
-                                   shapes=shapes, 
-                                   out_shape=out_shape, 
-                                   transform=transform, 
+                                   shapes=shapes,
+                                   out_shape=out_shape,
+                                   transform=transform,
                                    fill=-1,
                                    all_touched=False,
                                    #default_value=1,
@@ -132,13 +135,12 @@ out_meta= {"driver": "GTiff",
                    "width": src.width,
                    "transform": transform,
                    "count": 1,
-        			 # Specify to any crs by defining here. if you don't do so, 
+        			 # Specify to any crs by defining here. if you don't do so,
         			 # it sets up to wgs84 geographic by default (weird tho)
                    #"crs": "+proj=utm +zone=29 +ellps=WGS84 +datum=WGS84 +units=m +no_defs "
                    "crs":  out_meta['crs']
                   }
-                  
+
 # Write the raster to disk
-with rasterio.open(join(OUT_PATH, 'truth_patches_0.tif'), "w", **out_meta) as dest:
-    dest.write(array_to_rast, indexes=1)  
-    
+with rasterio.open(OUT_PATH, "w", **out_meta) as dest:
+    dest.write(array_to_rast, indexes=1)
