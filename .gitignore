@@ -1,0 +1,14 @@
+*.cpg
+*.dbf
+*.prj
+*.sbn
+*.shp*
+*.sbx
+*.shx
+*/cos/*.csv
+*.gpj
+*.gpkg*
+*.tif
+*.qpj
+*.png
+*/train_data/*
