@@ -19,6 +19,8 @@ from rasterio import Affine
 from sklearn.impute import SimpleImputer 
 import glob
 
+n_run = 2
+
 #===================
 # Defining paths
 #===================
@@ -46,11 +48,22 @@ n_sample = 250
 #==============================
 # load all samples from tile 29SND
 all_29SND_best_feat = pd.read_csv(all_29SND_path, index_col=0)
-# load the initial train samples
+# load the initial train samples (samples form the previous step)
 train_initial_29SND = pd.read_csv(join(PATH, 'train_data', 'train_initial_29SND.csv'), index_col=0)
+
+# get all the previous samples form agricultural data
+train_previous = train_initial_29SND
+
+search_criteria = "agri_samples*.csv"
+querie = join(PATH, 'train_data',search_criteria)   
+csv_paths = glob.glob(querie)
+for csv_path in csv_paths:
+    agri_previous = pd.read_csv(csv_path, index_col=0)
+    train_previous = pd.concat((train_previous, agri_previous), axis = 0,  ignore_index=True)
+
 # subtract intial train from all samples of 29SND to 
 # get the samples not included in the initial train
-candidate_samples = all_29SND_best_feat.loc[~all_29SND_best_feat['Object_ID'].isin(train_initial_29SND['Object_ID'].values)]
+candidate_samples = all_29SND_best_feat.loc[~all_29SND_best_feat['Object_ID'].isin(train_previous['Object_ID'].values)]
 
 #=============================================================================
 # subsetting the training data
@@ -82,7 +95,7 @@ agri_classes = [9,10,11,12,13,14,15,16,17,18] # 10 classes
 # select only agricultural classes out of new_train_data
 agri_samples = new_train_29SND.loc[new_train_29SND['classes'].isin(agri_classes)]
 
-agri_samples.to_csv(join(PATH, 'train_data', 'agri_samples_1_sel.csv'), sep=',',header=True, index=True)
+agri_samples.to_csv(join(PATH, 'train_data', f'agri_samples_{n_run}_sel.csv'), sep=',',header=True, index=True)
 
 #================================================================
 # Sampling the photointerpreted pixels 
@@ -211,9 +224,7 @@ df_sampled['y_geo'] = geo_coords.apply(lambda x: x[1])
 df_sampled = df_sampled.drop(columns=['x','y'])
 df_sampled.classes = df_sampled.classes.astype(int)
 
-'''
 # rearrange the columns names to match the other dataframes
-'''
 columns_order = agri_samples.drop(columns = 'Object_ID').columns.tolist()
 df_sampled = df_sampled.loc[:, columns_order]
 
@@ -241,7 +252,7 @@ active_selected_1_29SND =  df_sampled.groupby('classes')\
                    .apply(lambda x: x.sample(df2.loc[df2['classes']== x['classes'].iloc[0], 'size'].iloc[0]))\
                    .reset_index(drop=True)
 
-active_selected_1_29SND.to_csv(join(PATH, 'train_data', 'active_selected_1_29SND.csv'), sep=',',header=True, index=True)
+active_selected_1_29SND.to_csv(join(PATH, 'train_data', f'active_selected_{n_run}_29SND.csv'), sep=',',header=True, index=True)
 
 #================================================
 # Concatinate the parts of training data into one
@@ -250,26 +261,4 @@ train_data_1 = pd.concat((train_initial_29SND.drop(columns=['Object_ID']),\
                           agri_samples.drop(columns=['Object_ID']),\
                           active_selected_1_29SND), axis = 0,  ignore_index=True)
 
-train_data_1.to_csv(join(PATH, 'train_data', 'train_data_1.csv'), sep=',',header=True, index=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+train_data_1.to_csv(join(PATH, 'train_data', f'train_data_{n_run}.csv'), sep=',',header=True, index=True)
