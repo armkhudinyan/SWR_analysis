@@ -70,7 +70,7 @@ out_meta = src.meta.copy()
 print('truth_patches proj:', truth_patches.crs)
 print('raster proj:', src.crs)
 # In case of missmatching, the layers should be transformed into one crs
-#gdf_cosTejo_transf = gdf_cosTejo.to_crs(proj)
+#truth_patches = truth_patches.to_crs(proj)
 
 
 '''
@@ -78,17 +78,17 @@ print('raster proj:', src.crs)
 # If we want to clip shape with shape before rasterization
 #========================
 # save thr shapefile with new coordinates
-#gdf_cosTejo_transf.to_file(join(PATH, 'cos','cos_lazirio_tejo.shp'))
+#truth_patches.to_file(join(PATH, 'cos','truth_patches_transf.shp'))
 # another way is to do with fiona library => fiona.transform.transform_geom
 
-res_intersection = gpd.overlay(gdf_cosTejo_transf, gdf_cos15, how='intersection')
+ras_intersection = gpd.overlay(truth_patches, some_other_shape, how='intersection')
 
 # vizualize the reuslts
-ax = res_intersection.plot(cmap='tab10')
-gdf_cosTejo_transf.plot(ax=ax, facecolor='none', edgecolor='k');
-gdf_cos15.plot(ax=ax, facecolor='none', edgecolor='k');
+ax = ras_intersection.plot(cmap='tab10')
+truth_patches.plot(ax=ax, facecolor='none', edgecolor='k');
+some_other_shape.plot(ax=ax, facecolor='none', edgecolor='k');
 
-megaclass = Counter(gdf_cosTejo_transf['Megaclasse'])
+megaclass = Counter(truth_patches['Megaclasse'])
 df_megaclass = pd.Series(dict(Counter(megaclass)))
 '''
 
