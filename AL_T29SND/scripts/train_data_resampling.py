@@ -15,8 +15,8 @@ import pandas as pd
 import rasterio
 from rasterio.plot import show
 from rasterio import features
-from rasterio import Affine 
-from sklearn.impute import SimpleImputer 
+from rasterio import Affine
+from sklearn.impute import SimpleImputer
 import glob
 
 n_run = 2
@@ -55,13 +55,13 @@ train_initial_29SND = pd.read_csv(join(PATH, 'train_data', 'train_initial_29SND.
 train_previous = train_initial_29SND
 
 search_criteria = "agri_samples*.csv"
-querie = join(PATH, 'train_data',search_criteria)   
+querie = join(PATH, 'train_data',search_criteria)
 csv_paths = glob.glob(querie)
 for csv_path in csv_paths:
     agri_previous = pd.read_csv(csv_path, index_col=0)
     train_previous = pd.concat((train_previous, agri_previous), axis = 0,  ignore_index=True)
 
-# subtract intial train from all samples of 29SND to 
+# subtract intial train from all samples of 29SND to
 # get the samples not included in the initial train
 candidate_samples = all_29SND_best_feat.loc[~all_29SND_best_feat['Object_ID'].isin(train_previous['Object_ID'].values)]
 
@@ -71,7 +71,7 @@ class_id = sorted(candidate_samples.classes.unique().tolist())
 class_size = candidate_samples.groupby('classes').size()
 class_size_dict = dict(class_size)
 
-to_list = [class_size_dict[keys] for keys in class_size_dict]  
+to_list = [class_size_dict[keys] for keys in class_size_dict]
 
 # create list containing sample size per class
 sample_size = []
@@ -98,7 +98,7 @@ agri_samples = new_train_29SND.loc[new_train_29SND['classes'].isin(agri_classes)
 agri_samples.to_csv(join(PATH, 'train_data', f'agri_samples_{n_run}_sel.csv'), sep=',',header=True, index=True)
 
 #================================================================
-# Sampling the photointerpreted pixels 
+# Sampling the photointerpreted pixels
 #===============================================================
 feat_ranking = pd.read_csv(FEATURE_NAME_PATH)
 best_feat = feat_ranking['feature'].tolist()[:40]
@@ -117,7 +117,7 @@ rasters_path = []
 
 search_criteria = "*.tif"
 for path in ( INDICES_PATH, METRICS_PATH):
-    querie = join(path, search_criteria)   
+    querie = join(path, search_criteria)
     raster_path = glob.glob(querie)
     #print(raster_path)
     rasters_path.extend(raster_path)
@@ -234,7 +234,7 @@ class_id2 = sorted(df_sampled.classes.unique().tolist())
 class_size2 = df_sampled.groupby('classes').size()
 class_size_dict2 = dict(class_size2)
 
-to_list2 = [class_size_dict2[keys] for keys in class_size_dict2]  
+to_list2 = [class_size_dict2[keys] for keys in class_size_dict2]
 
 # create list containing sample size per class
 sample_size2 = []
