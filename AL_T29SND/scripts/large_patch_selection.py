@@ -5,15 +5,42 @@ Created on Thu Mar  5 23:50:08 2020
 @author: arman
 """
 import os
-from os.path import join
+from os.path import join, dirname
 import pandas as pd
 import geopandas as gpd
 
-PATH = r'C:\Users\arman\Desktop\ActiveLearning\Experiment\dgt_T29SND\delete'
-gdf_uncert = gpd.read_file(join(PATH,'uncert_intersect.shp'))
 
-# define the amount of patches to be selected per class
-n_patches = 10
+
+import optparse
+optparser = optparse.OptionParser()
+optparser.add_option(
+    "--n_run",
+    help = "Mandatory parameter. Iteration number."
+)
+
+optparser.add_option(
+    "--n_patches", default = '10',
+    help = "Number of patches per class to output in the final uncertainty patches passed to photointerpreters."
+)
+
+optparser.add_option(
+    "--uncertainty_path",
+    help = "Path to the post-processed uncertainty map shapefile."
+)
+
+options = optparser.parse_args()[0]
+if options.n_run is None:   # if filename is not given
+    optparser.error('Mandatory argument n_run not given.')
+if options.gdf_uncert is None:   # if filename is not given
+    optparser.error('Mandatory argument gdf_uncert not given.')
+
+n_run = int(options.n_run)
+n_patches = int(options.n_patches)
+uncertainty_path = options.uncertainty_path
+
+gdf_uncert = gpd.read_file(uncertainty_path)
+
+PATH = join(dirname(__file__), '..', 'uncertainty_patches')
 
 #==============================
 # Make dataframe containing class names and class IDs
@@ -53,33 +80,4 @@ largest_patches = largest_patches[~largest_patches['classes'].isin([-1,-2])]
 print('class sizes' ,largest_patches.groupby("Nomenclatu").size())
 
 # specify the directory to save the shapefile
-os.chdir(PATH)
-largest_patches.to_file(f'uncert_{n_patches}_pathches.shp')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+largest_patches.to_file(join(PATH, f'uncert_{n_patches}_patches_{n_run}.shp'))

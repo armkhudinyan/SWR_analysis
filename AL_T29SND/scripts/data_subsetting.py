@@ -30,7 +30,7 @@ import pickle
 # Defining paths
 #===================
 #sys.path.append(join(dirname(__file__), '..', '..'))
-PATH = r'C:\Users\arman\Desktop\ActiveLearning\Experiment\dgt_T29SND'
+PATH = join('__file__', '..')
 
 all_train_path = join(PATH, 'train_data', 'sampled_point_coordinates_s2.csv')
 xy_29SND_path = join(PATH, 'train_data', 'sample_xy_29SND.csv')
@@ -47,9 +47,9 @@ def pickle_save(fname, data):
 
 def pickle_load(fname):
   #print(os.getcwd(), os.listdir())
-  file = open(fname,'rb')
-  data = pickle.load(file)
-  file.close()
+  filehandler = open(fname,'rb')
+  data = pickle.load(filehandler)
+  filehandler.close()
   #print(data)
   return data
 

@@ -19,21 +19,44 @@ from rasterio import Affine
 from sklearn.impute import SimpleImputer
 import glob
 
-n_run = 2
+
+
+import optparse
+optparser = optparse.OptionParser()
+optparser.add_option(
+    "--n_run",
+    help = "Mandatory parameter. Iteration number."
+)
+
+optparser.add_option(
+    "--n_patches", default = '10',
+    help = "Number of patches per class to output in the final uncertainty patches passed to photointerpreters."
+)
+
+optparser.add_option(
+    "--composite_path", default = r'\\dgt-759\S2_2018\Theia_S2process\T29SND\composites',
+    help = "Tile composite directory."
+)
+
+options = optparser.parse_args()[0]
+if options.n_run is None:   # if filename is not given
+    optparser.error('Mandatory argument n_run not given.')
+
+n_run = int(options.n_run)
+SENTINEL_PATH = options.composite_path
 
 #===================
 # Defining paths
 #===================
 #sys.path.append(join(dirname(__file__), '..', '..'))
 #PATH = r'C:\Users\arman\Desktop\ActiveLearning\Experiment\dgt_T29SND'
-PATH = r'C:\Users\mkhudinyan\Desktop\GitHub\active-learning\AL_T29SND'
+PATH = join(dirname(__file__),'..')
 
 FEATURE_NAME_PATH = join(PATH, 'feature_importance', 'feature_rankings.csv')
 all_29SND_path = join(PATH, 'train_data', 'all_29SND_best_feat.csv')
-LABEL_RASTER_PATH = join(PATH, 'truth_rasters', 'truth_patches_0.tif')
+LABEL_RASTER_PATH = join(PATH, 'truth_rasters', f'truth_patches_{n_run-1}.tif')
 OUT_PATH = join(PATH, 'train_data')
 
-SENTINEL_PATH = r'\\dgt-759\S2_2018\Theia_S2process\T29SND\composites'
 METRICS_PATH = join(SENTINEL_PATH, 'metrics')
 INDICES_PATH = join(SENTINEL_PATH, 'indices')
 #==============================================================================

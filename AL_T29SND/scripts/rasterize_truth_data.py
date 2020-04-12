@@ -28,27 +28,33 @@ import glob
 import seaborn as sns
 from collections import Counter
 
+import optparse
+optparser = optparse.OptionParser()
+optparser.add_option(
+    "--n_run",
+    help = "Mandatory parameter. Iteration number."
+)
+
+options = optparser.parse_args()[0]
+if options.n_run is None:   # if filename is not given
+    optparser.error('Mandatory argument n_run not given.')
+
+n_run = int(options.n_run)
+
 #===================
 # Defining paths
 #===================
 #sys.path.append(join(dirname(__file__), '..', '..'))
 #PATH = r'C:\Users\arman\Documents\GitHub\active-learning\AL_T29SND'
 
-n_run = 1
-
-PATH = r'C:\Users\arman\Desktop\ActiveLearning\Experiment\dgt_T29SND'
-
-SENTINEL_PATH = r'\\dgt-759\S2_2018\Theia_S2process\T29SND\composites'
-METRICS_PATH = join(SENTINEL_PATH, 'metrics')
-INDICES_PATH = join(SENTINEL_PATH, 'indices')
-#INDICES_METRICS_PATH = join(SENTINEL_PATH, 'indices', 'metrics')
+PATH = join(dirname(__file__),'..')
 TRAIN_PATH = join(PATH, 'train_data','train_best_40.csv')
 FEATURE_NAME_PATH = join(PATH, 'feature_importance', 'feature_rankings.csv')
 
 
 SHAPE_PATH = join(PATH,  'truth_patches', f'truth_patches_{n_run}.shp')
 
-OUT_PATH = join(PATH, 'truth_rasters', f'truth_patches_{n_run+1}.tif')
+OUT_PATH = join(PATH, 'truth_rasters', f'truth_patches_{n_run}.tif')
 
 #==============================
 # rasterize shapefiles

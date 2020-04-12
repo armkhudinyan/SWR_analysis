@@ -28,19 +28,46 @@ import glob
 from collections import Counter
 import pickle
 
-# define the sequential number of AL procedure
-n_run = 1
+
+import optparse
+optparser = optparse.OptionParser()
+optparser.add_option(
+    "--n_run",
+    help = "Mandatory parameter. Iteration number."
+)
+
+optparser.add_option(
+    "--n_patches", default = '10',
+    help = "Number of patches per class to output in the final uncertainty patches passed to photointerpreters."
+)
+
+optparser.add_option(
+    "--composite_path", default = r'\\dgt-759\S2_2018\Theia_S2process\T29SND\composites',
+    help = "Tile composite directory."
+)
+
+options = optparser.parse_args()[0]
+if options.n_run is None:   # if filename is not given
+    optparser.error('Mandatory argument n_run not given.')
+
+n_run = int(options.n_run)
+SENTINEL_PATH = options.composite_path
+
+
 #===================
 # Defining paths
 #===================
 #sys.path.append(join(dirname(__file__), '..', '..'))
-PATH = r'C:\Users\mkhudinyan\Desktop\GitHub\active-learning\AL_T29SND'
+PATH = join(dirname(__file__), '..')
 
-SENTINEL_PATH = r'\\dgt-759\S2_2018\Theia_S2process\T29SND\composites'
+# variables passed through cli script
+#SENTINEL_PATH = r'\\dgt-759\S2_2018\Theia_S2process\T29SND\composites'
+#n_run = 1
+
 METRICS_PATH = join(SENTINEL_PATH, 'metrics')
 INDICES_PATH = join(SENTINEL_PATH, 'indices')
 #INDICES_METRICS_PATH = join(SENTINEL_PATH, 'indices', 'metrics')
-TRAIN_PATH = join(PATH, 'train_data','train_data_1.csv')
+TRAIN_PATH = join(PATH, f'train_data','train_data_{n_run}.csv')
 FEATURE_NAME_PATH = join(PATH, 'feature_importance', 'feature_rankings.csv')
 OUT_PATH = join(PATH, 'results')
 
@@ -50,7 +77,7 @@ OUT_PATH = join(PATH, 'results')
 def pickle_save(fname, data):
   filehandler = open(fname,"wb")
   pickle.dump(data,filehandler)
-  filehandler.close() 
+  filehandler.close()
   print('saved', fname, os.getcwd(), os.listdir())
 
 def pickle_load(fname):
