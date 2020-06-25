@@ -3,4 +3,4 @@ This repository contains an experimental setup for two popular Active Learning a
 
 The second version of this experiment includes a CLI. Run the script `active-learning/AL_T29SND/run_active_learning_iteration.py` as if you were running any typical Python script. The image below demonstrates the expected behavior of the CLI under different contexts.
 
-<br/><br/><img src='/images/cli.png' width='600' class='align-center'>
+<br/><br/><img src='/images/cli.png' class='align-center'>
