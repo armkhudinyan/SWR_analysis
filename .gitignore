@@ -10,5 +10,4 @@
 *.gpkg*
 *.tif
 *.qpj
-*.png
 */train_data/*
