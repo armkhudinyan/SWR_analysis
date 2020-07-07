@@ -81,11 +81,11 @@ check_call(command)
 
 
 
-# 4) QGIS Toolbox
+# 4) ArcGIS Toolbox
 print(f"""
 [{dt.datetime.now()}] [4/5] Main AL procedure finished. Results were stored in AL_T29SND/results/
 
-Uncertainty map post-processing step reached. Please open QGIS, import the toolbox provided matching your QGIS version and follow chapter 3 of AL_implementation_documentation.pdf
+Uncertainty map post-processing step reached. Please open ArcMAP, import the toolbox provided matching your ArcMAP (ArcGIS v>=10.4)  and follow chapter 3 of AL_implementation_documentation.pdf
 
 NOTES:
     1) Save the output shapefile in the following path: AL_T29SND/uncertainty_intersect/uncert_intersect_{n_run}.shp
